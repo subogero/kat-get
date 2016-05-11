@@ -9,3 +9,8 @@ kat-get(1) --  Search and start torrents from Kickass Torrents
 
 Lists the search hits with sizes and number of seeds, reads your choice
 from stdin, and starts the selected torrent via transmission-daemon.
+
+## DEPENDENCIES
+
+ libmojolicious-perl
+ transmission-daemon
