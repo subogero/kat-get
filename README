@@ -1,0 +1,11 @@
+kat-get(1) --  Search and start torrents from Kickass Torrents
+==============================================================
+
+## SYNOPSIS
+
+ kat-get MotoGP Jerez 720p
+
+## DESCRIPTION
+
+Lists the search hits with sizes and number of seeds, reads your choice
+from stdin, and starts the selected torrent via transmission-daemon.
