@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+use Mojolicious::Lite;
+use Mojo::UserAgent;
+use Mojo::DOM;
+use Mojo::Util qw(url_escape);
+
+my $ua = Mojo::UserAgent->new;
+
+my $magnet = cli() or die "No hits or selection\n";
+print "Starting $magnet\n";
+system "transmission-remote -a $magnet";
+
+sub cli {
+    $|++;
+    my $query = url_escape join(' ', @ARGV);
+    shift @ARGV while @ARGV;
+    return unless $query;
+    my @results = search($query);
+    my $i = 0;
+    print "No       SIZE  SEEDS  TITLE\n";
+    print map {
+        sprintf "%2d %10s %6d  %s\n", $i++, $_->{size}, $_->{seeds}, $_->{title}
+    } @results;
+    print "Enter No of torrent to start: ";
+    $i = <>;
+    chomp $i;
+    return unless $i =~ /^\d+$/ && $i < @results;
+    return $results[$i]->{magnet};
+}
+
+sub search {
+    my $query = shift;
+    my $rss = $ua->get("https://kat.cr/usearch/$query/?rss=1")->res->body;
+    my $dom = Mojo::DOM->new($rss);
+
+    return map { {
+        title => $_->children('title')->first->content,
+        magnet => $_->children('torrent\\:magnetURI')->first->content =~ /!\[CDATA\[(.+)\]\]/,
+        seeds => $_->children('torrent\\:seeds')->first->content,
+        size => human_size($_->children('torrent\\:contentLength')->first->content),
+    } } @{ $dom->find('item') };
+}
+
+sub human_size {
+    my $bytes = shift;
+    my $i = 0;
+    our @formats = ("%d", "%.2f K", "%.2f M", "%.2f G", "%.2f T");
+    while ($bytes >= 1024) {
+        $i++;
+        $bytes /= 1024;
+    }
+    return sprintf($formats[$i], $bytes);
+}
