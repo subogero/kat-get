@@ -43,7 +43,12 @@ my $ua = Mojo::UserAgent->new;
 # Routes
 get '/' => sub {
     my $c = shift;
-    $c->render(text => 'kat-get');
+    $c->render(template => 'page', title => 'Search');
+};
+
+get '/*query' => sub {
+    my $c = shift;
+    $c->render(json => [ search($c->stash('query')) ]);
 };
 
 # Run webapp or CLI
@@ -94,3 +99,28 @@ sub human_size {
     }
     return sprintf($formats[$i], $bytes);
 }
+
+__DATA__
+
+@@ page.html.ep
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<title>kat-get <%= $title %></title>
+</head>
+<body>
+<div class="header">
+<form name="search">
+kat-get
+<input type="text" name="katq" size="35" maxlength="80"
+onkeydown="if (event.keyCode == 13) { kat.search(this.value); return false; }">
+</form>
+</div>
+<div id="hits"></div>
+</body>
+</html>
+
+@@ style.css
+body { margin:0px }
+div.header { margin:0px; background-color:#CCC }
