@@ -3,17 +3,60 @@ use Mojolicious::Lite;
 use Mojo::UserAgent;
 use Mojo::DOM;
 use Mojo::Util qw(url_escape);
+use Getopt::Long;
 
+# Parse command line
+my $port;
+my $daemon;
+GetOptions(
+    "d|daemon" => \$daemon,
+    "p|port=i" => \$port,
+    "h|help" => sub {
+        print <<EOF;
+USAGE
+kat-get MotoGP Jerez 720p
+kat-get -d
+kat-get -p 8080
+
+DESCRIPTION
+Torrent search and start from Kickass Torrents, command line or webapp.
+In the first form run in CLI mode and search torrents for terms in args,
+and start selected torrent.
+Start as a webapp with options -d or -p.
+
+OPTIONS
+-d	start as webapp, default port 3000
+-p port	start as webapp on specified port
+-h	print this help
+EOF
+        exit 0;
+    },
+);
+$daemon = 1 if $port;
+$port //= 3000 if $daemon;
+my $query = url_escape join(' ', @ARGV);
+shift @ARGV while @ARGV;
+
+# User agent object
 my $ua = Mojo::UserAgent->new;
 
-my $magnet = cli() or die "No hits or selection\n";
-print "Starting $magnet\n";
-system "transmission-remote -a $magnet";
+# Routes
+get '/' => sub {
+    my $c = shift;
+    $c->render(text => 'kat-get');
+};
 
+# Run webapp or CLI
+if ($daemon) {
+    app->start('daemon', "http://*:$port");
+} else {
+    my $magnet = cli() or die "No hits or selection\n";
+    system "transmission-remote -a $magnet";
+}
+
+# Helpers
 sub cli {
     $|++;
-    my $query = url_escape join(' ', @ARGV);
-    shift @ARGV while @ARGV;
     return unless $query;
     my @results = search($query);
     my $i = 0;
