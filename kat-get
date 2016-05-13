@@ -107,6 +107,7 @@ __DATA__
 <html>
 <head>
 <link rel="stylesheet" href="style.css">
+<script src="kat.js"></script>
 <title>kat-get <%= $title %></title>
 </head>
 <body>
@@ -118,9 +119,11 @@ onkeydown="if (event.keyCode == 13) { kat.search(this.value); return false; }">
 </form>
 </div>
 <div id="hits"></div>
+<div id="status"></div>
 </body>
 </html>
 
 @@ style.css
 body { margin:0px }
-div.header { margin:0px; background-color:#CCC }
+div.header { margin:0px; background-color:#650; color:white }
+#status { margin:0px; background-color:#650; color:white }
