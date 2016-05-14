@@ -43,7 +43,7 @@ my $ua = Mojo::UserAgent->new;
 # Routes
 get '/' => sub {
     my $c = shift;
-    $c->render(template => 'page', title => 'Search');
+    $c->render(template => 'page', title => 'Torrents');
 };
 
 get '/*query' => sub {
@@ -115,6 +115,11 @@ __DATA__
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link href="favicon.png" rel="icon" />
+<link href="favicon.png" rel="shortcut icon" />
+<link rel="apple-touch-icon" href="webclip-icon.png" />
 <link rel="stylesheet" href="style.css">
 <script src="kat.js"></script>
 <title>kat-get <%= $title %></title>
@@ -123,7 +128,7 @@ __DATA__
 <div class="bar" id="toolbar">
 <form name="search">
 kat-get
-<input type="text" id="query" name="katq" size="50" maxlength="80"
+<input type="text" id="query" size="30" maxlength="80"
 onkeydown="if (event.keyCode == 13) { kat.search(this.value); return false; }">
 </form>
 </div>
