@@ -111,7 +111,7 @@ __DATA__
 <title>kat-get <%= $title %></title>
 </head>
 <body>
-<div class="header">
+<div id="toolbar">
 <form name="search">
 kat-get
 <input type="text" name="katq" size="35" maxlength="80"
@@ -125,5 +125,5 @@ onkeydown="if (event.keyCode == 13) { kat.search(this.value); return false; }">
 
 @@ style.css
 body { margin:0px }
-div.header { margin:0px; background-color:#650; color:white }
-#status { margin:0px; background-color:#650; color:white }
+#toolbar { top:0; position:fixed; width:100%; margin:0px; background-color:#650; color:white }
+#status { bottom:0; position:fixed; width:100%; margin:0px; background-color:#650; color:white }
