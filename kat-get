@@ -2,7 +2,7 @@
 use Mojolicious::Lite;
 use Mojo::UserAgent;
 use Mojo::DOM;
-use Mojo::Util qw(url_escape);
+use Mojo::Util qw(url_escape url_unescape);
 use Getopt::Long;
 
 # Parse command line
@@ -48,12 +48,26 @@ get '/' => sub {
 
 get '/*query' => sub {
     my $c = shift;
+    my $in = url_unescape $c->stash('query');
+    if (length $in > 80 || $in !~ /^[-\w ]*$/) {
+        app->log->debug($in);
+        $c->render(text => "Query too long or wrong format", status => 400);
+        return;
+    }
     $c->render(json => [ search($c->stash('query')) ]);
 };
 
 post 'start' => sub {
     my $c = shift;
     my $data = $c->req->json;
+    unless (
+        defined $data->{magnet} &&
+        length $data->{magnet} < 1000 &&
+        $data->{magnet} =~ /^magnet:\?/
+    ) {
+        $c->render(text => "No magnet link in request", status => 400);
+        return;
+    }
     my $res = system "transmission-remote -a $data->{magnet}";
     my $code = $res ? 500 : 201;
     $c->render(text => "transmission-remote exited $res", status => $code);
