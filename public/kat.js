@@ -11,6 +11,7 @@ kat.search = function(query) {
         } else {
             statusbar.innerHTML = req.status + ' ' + req.responseText;
         }
+        kat.focusQuery();
     }
     req.open("GET", query, true);
     req.send();
@@ -81,4 +82,10 @@ kat.start = function() {
     req.open("POST", 'start', true);
     req.setRequestHeader("Content-type","application/json");
     req.send(JSON.stringify({ magnet: this.getAttribute('magnet') }));
+}
+
+kat.focusQuery = function() {
+    var queryfield = document.getElementById('query')
+    queryfield.focus();
+    queryfield.select();
 }

@@ -119,11 +119,11 @@ __DATA__
 <script src="kat.js"></script>
 <title>kat-get <%= $title %></title>
 </head>
-<body>
+<body onload="kat.focusQuery()">
 <div class="bar" id="toolbar">
 <form name="search">
 kat-get
-<input type="text" name="katq" size="50" maxlength="80"
+<input type="text" id="query" name="katq" size="50" maxlength="80"
 onkeydown="if (event.keyCode == 13) { kat.search(this.value); return false; }">
 </form>
 </div>
