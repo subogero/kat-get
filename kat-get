@@ -65,9 +65,9 @@ sub cli {
     return unless $query;
     my @results = search($query);
     my $i = 0;
-    print "No       SIZE  SEEDS  TITLE\n";
+    print "No  SEEDS    SIZE  TITLE\n";
     print map {
-        sprintf "%2d %10s %6d  %s\n", $i++, $_->{size}, $_->{seeds}, $_->{title}
+        sprintf "%2d %6d %7s  %s\n", $i++, $_->{seeds}, $_->{size}, $_->{title}
     } @results;
     print "Enter No of torrent to start: ";
     $i = <>;
@@ -81,7 +81,7 @@ sub search {
     my $rss = $ua->get("https://kat.cr/usearch/$query/?rss=1")->res->body;
     my $dom = Mojo::DOM->new($rss);
 
-    return map { {
+    return sort { $b->{seeds} <=> $a->{seeds} } map { {
         title => $_->children('title')->first->content,
         magnet => $_->children('torrent\\:magnetURI')->first->content =~ /!\[CDATA\[(.+)\]\]/,
         seeds => $_->children('torrent\\:seeds')->first->content,
@@ -92,11 +92,12 @@ sub search {
 sub human_size {
     my $bytes = shift;
     my $i = 0;
-    our @formats = ("%d", "%.2f K", "%.2f M", "%.2f G", "%.2f T");
     while ($bytes >= 1024) {
         $i++;
         $bytes /= 1024;
     }
+    my $dec = $bytes < 10 ? 1 : 0;
+    our @formats = ("%d", "%.${dec}fK", "%.${dec}fM", "%.${dec}fG", "%.${dec}fT");
     return sprintf($formats[$i], $bytes);
 }
 
@@ -111,19 +112,14 @@ __DATA__
 <title>kat-get <%= $title %></title>
 </head>
 <body>
-<div id="toolbar">
+<div class="bar" id="toolbar">
 <form name="search">
 kat-get
-<input type="text" name="katq" size="35" maxlength="80"
+<input type="text" name="katq" size="50" maxlength="80"
 onkeydown="if (event.keyCode == 13) { kat.search(this.value); return false; }">
 </form>
 </div>
 <div id="hits"></div>
-<div id="status"></div>
+<div class="bar" id="status">Welcome to kat-get</div>
 </body>
 </html>
-
-@@ style.css
-body { margin:0px }
-#toolbar { top:0; position:fixed; width:100%; margin:0px; background-color:#650; color:white }
-#status { bottom:0; position:fixed; width:100%; margin:0px; background-color:#650; color:white }

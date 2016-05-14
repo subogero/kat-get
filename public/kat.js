@@ -17,7 +17,7 @@ kat.search = function(query) {
 
 kat.render = function(hitlist) {
     var table = document.createElement('TABLE');
-    table.appendChild(kat.tableheader(['', 'Size', 'Seeds', 'Title']));
+    table.appendChild(kat.tableheader(['', 'Seeds', 'Size', 'Title']));
     for (i = 0; i < hitlist.length; i++) {
         table.appendChild(kat.renderhit(hitlist[i]));
     }
@@ -42,18 +42,21 @@ kat.renderhit = function(hit) {
     var d0 = document.createElement('TD');
     var b = document.createElement('INPUT');
     b.type = 'button';
-    b.value = 'Start';
+    b.value = '↷';
+    b.title = 'start torrent';
     b.setAttribute('magnet', hit.magnet);
     b.onclick = kat.start;
     d0.appendChild(b);
     row.appendChild(d0);
 
     var d1 = document.createElement('TD');
-    d1.appendChild(document.createTextNode(hit.size));
+    d1.appendChild(document.createTextNode(hit.seeds));
+    d1.className = 'num';
     row.appendChild(d1);
 
     var d2 = document.createElement('TD');
-    d2.appendChild(document.createTextNode(hit.seeds));
+    d2.appendChild(document.createTextNode(hit.size));
+    d2.className = 'num';
     row.appendChild(d2);
 
     var d3 = document.createElement('TD');
