@@ -4,11 +4,12 @@ kat.search = function(query) {
     document.getElementById("status").innerHTML = "Waiting for kat.cr...";
     var req = new XMLHttpRequest();
     req.onreadystatechange = function() {
+        var statusbar = document.getElementById("status");
         if (req.readyState == 4 && req.status == 200) {
             kat.render(JSON.parse(req.responseText));
-            document.getElementById("status").innerHTML = '200';
+            statusbar.innerHTML = '200';
         } else {
-            document.getElementById("status").innerHTML = req.status + ' ' + req.responseText;
+            statusbar.innerHTML = req.status + ' ' + req.responseText;
         }
     }
     req.open("GET", query, true);
@@ -70,14 +71,14 @@ kat.start = function() {
     document.getElementById("status").innerHTML = "Starting torrent...";
     var req = new XMLHttpRequest();
     req.onreadystatechange = function() {
-        if (req.readyState == 4 && req.status == 200) {
-            document.getElementById("status").innerHTML = "Torrent started";
-            kat.render(JSON.parse(req.responseText));
+        var statusbar = document.getElementById("status");
+        if (req.readyState == 4 && req.status == 201) {
+            statusbar.innerHTML = "201 Torrent started";
         } else {
-            document.getElementById("status").innerHTML = req.status + ' ' + req.responseText;
+            statusbar.innerHTML = req.status + ' ' + req.responseText;
         }
     }
     req.open("POST", 'start', true);
     req.setRequestHeader("Content-type","application/json");
-    req.send(JSON.stringify({ magnet: this.magnet }));
+    req.send(JSON.stringify({ magnet: this.getAttribute('magnet') }));
 }

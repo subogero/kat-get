@@ -51,6 +51,14 @@ get '/*query' => sub {
     $c->render(json => [ search($c->stash('query')) ]);
 };
 
+post 'start' => sub {
+    my $c = shift;
+    my $data = $c->req->json;
+    my $res = system "transmission-remote -a $data->{magnet}";
+    my $code = $res ? 500 : 201;
+    $c->render(text => "transmission-remote exited $res", status => $code);
+};
+
 # Run webapp or CLI
 if ($daemon) {
     app->start('daemon', "http://*:$port");
