@@ -1,0 +1,10 @@
+[Unit]
+Description=kat-get torrents
+After=network.target
+
+[Service]
+ExecStart=/var/lib/kat-get/kat-get -d
+
+[Install]
+WantedBy=multi-user.target
+Alias=kat-get

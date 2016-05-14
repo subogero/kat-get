@@ -19,3 +19,13 @@ or with -p on the specified port.
 
  libmojolicious-perl
  transmission-daemon
+
+## INSTALL
+
+Install and start kat-get as a systemd service with alias kat-get:
+
+ sudo make install
+
+Stop and remove systemd service:
+
+ sudo make uninstall
