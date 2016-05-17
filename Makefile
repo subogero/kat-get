@@ -2,7 +2,7 @@ start:
 	./kat-get -d
 cli:
 	./kat-get MotoGP
-install:
+install: uninstall
 	mkdir /var/lib/kat-get
 	cp -r public kat-get kat-get.service /var/lib/kat-get
 	ln -s /var/lib/kat-get/kat-get /usr/bin

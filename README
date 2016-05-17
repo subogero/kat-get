@@ -12,7 +12,7 @@ kat-get(1) --  Search and start torrents from Kickass Torrents
 Lists the search hits with sizes and number of seeds, reads your choice
 from stdin, and starts the selected torrent via transmission-daemon.
 
-With -d starts as a webapp on default port 3000,
+With -d starts as a webapp on default port 31101,
 or with -p on the specified port.
 
 ## DEPENDENCIES

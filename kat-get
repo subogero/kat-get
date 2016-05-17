@@ -25,7 +25,7 @@ and start selected torrent.
 Start as a webapp with options -d or -p.
 
 OPTIONS
--d	start as webapp, default port 3000
+-d	start as webapp, default port 31101
 -p port	start as webapp on specified port
 -h	print this help
 EOF
@@ -33,7 +33,7 @@ EOF
     },
 );
 $daemon = 1 if $port;
-$port //= 3000 if $daemon;
+$port //= 31101 if $daemon;
 my $query = url_escape join(' ', @ARGV);
 shift @ARGV while @ARGV;
 
@@ -75,7 +75,7 @@ post 'start' => sub {
 
 # Run webapp or CLI
 if ($daemon) {
-    app->start('daemon', "http://*:$port");
+    app->start('daemon', '-l', "http://*:$port");
 } else {
     my $magnet = cli() or die "No hits or selection\n";
     system "transmission-remote -a $magnet";
