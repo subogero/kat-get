@@ -1,0 +1,5 @@
+#!/bin/sh
+echo Running kat-get postinst >&2
+ln -s /usr/share/kat-get/kat-get /usr/bin
+systemctl enable /usr/share/kat-get/kat-get.service
+systemctl start kat-get

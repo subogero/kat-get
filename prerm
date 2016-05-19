@@ -1,0 +1,5 @@
+#!/bin/sh
+echo Running kat-get prerm >&2
+systemctl stop kat-get || true
+systemctl disable kat-get || true
+rm /usr/bin/kat-get || true
