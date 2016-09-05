@@ -37,6 +37,11 @@ $port //= 31101 if $daemon;
 my $query = url_escape join(' ', @ARGV);
 shift @ARGV while @ARGV;
 
+# URLs
+my %urls = (
+    rss => "https://kat.cr/usearch/%s/?rss=1",
+    html => "https://kickasstop.com/search.php?q=%s",
+);
 # User agent object
 my $ua = Mojo::UserAgent->new;
 
@@ -54,7 +59,7 @@ get '/*query' => sub {
         $c->render(text => "Query too long or wrong format", status => 400);
         return;
     }
-    $c->render(json => [ search($c->stash('query')) ]);
+    $c->render(json => [ search_html($c->stash('query')) ]);
 };
 
 post 'start' => sub {
@@ -85,7 +90,7 @@ if ($daemon) {
 sub cli {
     $|++;
     return unless $query;
-    my @results = search($query);
+    my @results = search_html($query);
     my $i = 0;
     print "No  SEEDS    SIZE  TITLE\n";
     print map {
@@ -98,9 +103,10 @@ sub cli {
     return $results[$i]->{magnet};
 }
 
-sub search {
+sub search_rss {
     my $query = shift;
-    my $rss = $ua->get("https://kat.cr/usearch/$query/?rss=1")->res->body;
+    my $url = sprintf $urls{rss}, $query;
+    my $rss = $ua->get($url)->res->body;
     my $dom = Mojo::DOM->new($rss);
 
     return sort { $b->{seeds} <=> $a->{seeds} } map { {
@@ -109,6 +115,19 @@ sub search {
         seeds => $_->children('torrent\\:seeds')->first->content,
         size => human_size($_->children('torrent\\:contentLength')->first->content),
     } } @{ $dom->find('item') };
+}
+
+sub search_html {
+    my $query = join '+', split(/\s/, shift);
+    my $url = sprintf $urls{html}, $query;
+    my $html = $ua->get($url)->res->body;
+    return sort { $b->{seeds} <=> $a->{seeds} } map {
+        my ($magnet, $title) = /href="(magnet:.+?n=(.+?)&.+?)"/;
+        my ($size, $unit) = m|<td class="nobr center"> (.+?)&nbsp;(.)iB .*?</td>|;
+        $size .= $unit;
+        my ($seeds) = m|<td class="green center">(\d+)</td>|;
+        { title => $title, magnet => $magnet, seeds => $seeds, size => $size }
+    } $html =~ m|<tr class="odd".+?</tr>|sg;
 }
 
 sub human_size {
